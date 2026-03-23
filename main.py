@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 from sqlalchemy import select
 
 from db import SessionLocal, init_models
-from handlers import analyze_day_router
+from handlers import analyze_day_router, next_screen_router
 from models import User, UserEvent
 
 
@@ -103,6 +103,7 @@ async def main() -> None:
 	dp = Dispatcher()
 	dp.include_router(router)
 	dp.include_router(analyze_day_router)
+	dp.include_router(next_screen_router)
 
 	await dp.start_polling(bot)
 
