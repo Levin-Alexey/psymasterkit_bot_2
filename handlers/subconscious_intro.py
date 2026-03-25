@@ -1,5 +1,5 @@
 from aiogram import F, Router
-from aiogram.types import CallbackQuery
+from aiogram.types import CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup
 from sqlalchemy import select
 
 from db import SessionLocal
@@ -7,6 +7,41 @@ from models import User, UserEvent
 
 
 router = Router()
+
+SUBCONSCIOUS_TEXT = (
+    "Мы часто думаем, что наша жизнь зависит только от наших решений и усилий.\n"
+    "<b>Но на самом деле наш мозг работает на двух уровнях: сознания и подсознания.</b>\n"
+    "И именно подсознание во многом определяет:\n"
+    " - как мы реагируем на события\n"
+    " - какие решения принимаем\n"
+    " - какое состояние испытываем\n"
+    " - и какие результаты снова и снова получаем в жизни\n"
+    "Поэтому иногда возникает странное ощущение: головой мы хотим одного, а <b>в реальности получается совсем другое.</b>\n"
+    "Почему так происходит?\n"
+    "👉🏼Потому что в подсознании постепенно формируются <b>внутренние установки</b> - незаметные программы мышления, которые появляются из:\n"
+    "- прошлого опыта\n"
+    "- воспитания\n"
+    "- фраз, которые мы слышали в детстве\n"
+    "- сильных эмоций и переживаний\n"
+    "Со временем они начинают автоматически влиять на наше состояние и реакции. И человек может даже не замечать этого. Но именно из этих реакций постепенно складываются:\n"
+    "- уровень энергии\n"
+    "- привычные решения\n"
+    "- эмоциональное состояние\n"
+    "- и то, каким становится наш обычный день.\n"
+    "А из дней постепенно формируется вся жизнь.\n"
+    "Поэтому часто дело не только в усилиях. Сначала важно понять, какие установки уже работают внутри нас.\n"
+    "Мы подготовили короткое видео, которое наглядно показывает, как взаимодействуют сознание и подсознание — и почему это так влияет на нашу жизнь.\n"
+    "Посмотрите его ⤵️"
+)
+
+
+def subconscious_keyboard() -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [InlineKeyboardButton(text="Посмотреть видео", url="https://ya.ru")],
+            [InlineKeyboardButton(text="Что делать дальше?", callback_data="what_next_subconscious")],
+        ]
+    )
 
 
 async def get_or_create_user(
@@ -53,9 +88,17 @@ async def open_subconscious_next_screen(callback: CallbackQuery) -> None:
                 payload={"source": "subconscious_intro"},
             )
         )
+        session.add(
+            UserEvent(
+                user_id=user.id,
+                event_code="subconscious_screen_open",
+                payload={"step": "subconscious_explanation"},
+            )
+        )
         await session.commit()
 
     if callback.message is not None:
         await callback.message.answer(
-            "Переходим к следующему экрану про подсознание. Пришлите следующий текст и кнопки, и я добавлю их сюда."
+            SUBCONSCIOUS_TEXT,
+            reply_markup=subconscious_keyboard(),
         )
