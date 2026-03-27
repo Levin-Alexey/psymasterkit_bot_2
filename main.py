@@ -12,11 +12,13 @@ from sqlalchemy import select
 from db import SessionLocal, init_models
 from handlers import (
 	analyze_day_router,
+	how_it_works_for_me_router,
 	how_to_do_it_router,
 	ideal_day_router,
 	master_kit_details_router,
 	master_kit_how_router,
 	methodology_help_router,
+	more_stories_router,
 	next_screen_router,
 	reason_choice_router,
 	subconscious_intro_router,
@@ -124,6 +126,8 @@ async def main() -> None:
 	dp.include_router(master_kit_how_router)
 	dp.include_router(master_kit_details_router)
 	dp.include_router(methodology_help_router)
+	dp.include_router(more_stories_router)
+	dp.include_router(how_it_works_for_me_router)
 	dp.include_router(try_methodology_router)
 
 	await dp.start_polling(bot)

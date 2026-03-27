@@ -1,9 +1,11 @@
 from .analyze_day import router as analyze_day_router
+from .how_it_works_for_me import router as how_it_works_for_me_router
 from .how_to_do_it import router as how_to_do_it_router
 from .master_kit_details import router as master_kit_details_router
 from .ideal_day import router as ideal_day_router
 from .master_kit_how import router as master_kit_how_router
 from .methodology_help import router as methodology_help_router
+from .more_stories import router as more_stories_router
 from .next_screen import router as next_screen_router
 from .reason_choice import router as reason_choice_router
 from .subconscious_intro import router as subconscious_intro_router
