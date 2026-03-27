@@ -1,3 +1,6 @@
+import os
+
+from aiohttp import ClientError, ClientSession
 from aiogram import F, Router
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
@@ -9,6 +12,11 @@ from models import User, UserEvent
 
 
 router = Router()
+
+N8N_WEBHOOK_URL = os.getenv(
+    "N8N_WEBHOOK_URL",
+    "https://superegocomp.app.n8n.cloud/webhook/bot2",
+).strip()
 
 TRY_METHODOLOGY_TEXT = (
     "Чтобы вы могли попробовать методику на практике, в <b>Master Kit есть бесплатный вводный блок - 0 уровень</b>.\n"
@@ -93,15 +101,53 @@ FINAL_TEXT = (
 )
 
 
-async def send_to_n8n_stub(user: User) -> dict:
-    # Заглушка: здесь будет реальный POST-запрос в n8n webhook для отправки лида в amoCRM.
-    return {
-        "status": "stub",
-        "amo_crm_sent": False,
+async def send_to_n8n(user: User) -> dict:
+    payload = {
+        "user_name": user.user_name,
+        "phone": user.phone,
+        "user_type": "bot_2",
+        "telegram_username": user.telegram_username,
+        "email": user.email,
         "telegram_id": user.telegram_id,
-        "phone_exists": bool(user.phone),
-        "email_exists": bool(user.email),
     }
+
+    if not N8N_WEBHOOK_URL:
+        return {
+            "status": "error",
+            "amo_crm_sent": False,
+            "reason": "webhook_url_empty",
+            "payload": payload,
+        }
+
+    try:
+        async with ClientSession() as client:
+            async with client.post(
+                N8N_WEBHOOK_URL,
+                json=payload,
+                timeout=15,
+            ) as response:
+                response_text = await response.text()
+                is_ok = 200 <= response.status < 300
+                return {
+                    "status": "success" if is_ok else "http_error",
+                    "amo_crm_sent": is_ok,
+                    "http_status": response.status,
+                    "response_text": response_text[:500],
+                    "payload": payload,
+                }
+    except ClientError as exc:
+        return {
+            "status": "network_error",
+            "amo_crm_sent": False,
+            "error": str(exc),
+            "payload": payload,
+        }
+    except TimeoutError:
+        return {
+            "status": "timeout",
+            "amo_crm_sent": False,
+            "payload": payload,
+        }
 
 
 async def get_or_create_user(
@@ -296,7 +342,7 @@ async def open_final_screen(callback: CallbackQuery) -> None:
         username=callback.from_user.username,
     )
 
-    n8n_result = await send_to_n8n_stub(user)
+    n8n_result = await send_to_n8n(user)
 
     async with SessionLocal() as session:
         session.add(
@@ -316,7 +362,7 @@ async def open_final_screen(callback: CallbackQuery) -> None:
         session.add(
             UserEvent(
                 user_id=user.id,
-                event_code="n8n_send_stub",
+                event_code="n8n_send",
                 payload=n8n_result,
             )
         )

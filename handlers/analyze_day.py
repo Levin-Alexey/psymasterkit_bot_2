@@ -138,7 +138,7 @@ async def handle_morning_choice(callback: CallbackQuery) -> None:
         username=tg_user.username,
         time_of_day="morning",
         answer_text=answer_text,
-        event_code="moning",
+        event_code="morning",
         choice_code=choice_code,
     )
 
