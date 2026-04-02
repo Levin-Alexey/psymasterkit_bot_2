@@ -63,7 +63,7 @@ def continue_keyboard() -> InlineKeyboardMarkup:
 def final_links_keyboard() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(
         inline_keyboard=[
-            [InlineKeyboardButton(text="Перейти на сайт", url="https://ya.ru")],
+            [InlineKeyboardButton(text="Перейти на сайт", url="https://super-ego.info/site/")],
             [
                 InlineKeyboardButton(
                     text="Перейти в Master Kit PRO",

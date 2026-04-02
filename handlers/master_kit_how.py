@@ -39,7 +39,7 @@ def master_kit_info_keyboard() -> InlineKeyboardMarkup:
                     url="https://1000stories-mk.ru/?ysclid=mkvdq7ps2t580395367",
                 )
             ],
-            [InlineKeyboardButton(text="ИНСТИТУТ САМОРЕГУЛЯЦИИ", url="https://ya.ru")],
+            [InlineKeyboardButton(text="ИНСТИТУТ САМОРЕГУЛЯЦИИ", url="https://super-ego.info/site/")],
             [InlineKeyboardButton(text="Узнать подробнее", callback_data="master_kit_details")],
         ]
     )
